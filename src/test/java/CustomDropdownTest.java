@@ -14,22 +14,28 @@ public class CustomDropdownTest extends BaseTest {
     public void selectValueFromCustomDropdown() {
         driver.get("https://demoqa.com/select-menu");
 
-        By valueDropdown = By.xpath("//div[@id='withOptGroup']");
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        By valueDropdown = By.xpath("//div[@id='withOptGroup']");
+
+        suppressAds();
         wait.until(ExpectedConditions.elementToBeClickable(valueDropdown)).click();
 
-        // Remove potential anchor ad iframe that can intercept clicks
-        ((JavascriptExecutor) driver).executeScript(
-                "document.querySelectorAll(\"iframe[id^='google_ads_iframe']\").forEach(el => el.remove());");
-
         By optionLocator = By.xpath("//div[contains(@class,'option') and normalize-space()='Group 2, option 1']");
-        WebElement option = wait.until(ExpectedConditions.elementToBeClickable(optionLocator));
+        WebElement option = wait.until(ExpectedConditions.visibilityOfElementLocated(optionLocator));
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", option);
-        option.click();
+        suppressAds();
+        wait.until(ExpectedConditions.elementToBeClickable(optionLocator));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", option);
 
         By selectedValueLocator = By.xpath("//div[@id='withOptGroup']//div[contains(@class,'singleValue')]");
         String selectedText = wait.until(ExpectedConditions.visibilityOfElementLocated(selectedValueLocator)).getText();
 
         Assert.assertEquals(selectedText, "Group 2, option 1");
+    }
+
+    private void suppressAds() {
+        String script = "document.querySelectorAll(\"iframe[id^='google_ads_iframe'], div[id^='google_ads_iframe'], #adplus-anchor\")"
+                + ".forEach(el => el.style.display = 'none');";
+        ((JavascriptExecutor) driver).executeScript(script);
     }
 }
