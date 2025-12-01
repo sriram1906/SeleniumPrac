@@ -11,7 +11,7 @@ public class BaseTest {
         driver.manage().window().maximize();
         Thread.sleep(500); // small pause to allow window initialization
     }
-    //@AfterMethod
+    @AfterMethod
     public void quitdriver()
     {
         driver.quit(); // close browser after each test
